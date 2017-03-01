@@ -86,7 +86,7 @@ def generate_labelled_patches(gridrefs, patchsize, patchstep=1, batch_size=32, s
 					else:
 						yield batch_img, batch_clz
 
-def load_labelled_patches(gridrefs, patchsize, patchstep=1, shuffle=False, basedir='data', clztype='theme', vistype='3band'):
+def load_labelled_patches(gridrefs, patchsize, patchstep=1, limit=None, shuffle=False, basedir='data', clztype='theme', vistype='3band'):
 	"""Generate batches of labelled patches"""
 	mapping = load_class_mapping(basedir=basedir, type=clztype)
 	mapping_keys = [ k for k in mapping ]
@@ -109,10 +109,12 @@ def load_labelled_patches(gridrefs, patchsize, patchstep=1, shuffle=False, based
 		width, height, depth = img.shape
 
 		if batch_clz == None:
-			batch_size = len(gridrefs) * (height - patchsize) / patchstep * (width - patchsize) / patchstep
+			batch_size = len(gridrefs) * (1 + ((height - patchsize) / patchstep)) * (1 + ((width - patchsize) / patchstep))
+			if limit != None:
+				batch_size = min(batch_size, limit)
 			batch_clz = np.zeros((batch_size, len(mapping)))
 			batch_img = np.zeros((batch_size, patchsize, patchsize, depth))
-			
+	
 		if shuffle:
 			sample_locations = shuffled_coord_generator
 		else:
@@ -126,6 +128,8 @@ def load_labelled_patches(gridrefs, patchsize, patchstep=1, shuffle=False, based
 			batch_clz[batch_idx, :] = 0
 			batch_clz[batch_idx][mapping_keys.index(theclz)] = 1 
 			batch_idx = batch_idx + 1
+			if batch_idx == limit / len(gridrefs):
+				break
 
 	if dim_ordering == 'th':
 		return batch_img.transpose(0, 3, 1, 2), batch_clz
@@ -137,4 +141,4 @@ def load_labelled_patches(gridrefs, patchsize, patchstep=1, shuffle=False, based
 # 	for patch, clz in batch:
 # 		print patch
 
-print load_labelled_patches(["SU4111"], 3, patchstep=50)
+# print load_labelled_patches(["SU4111"], 3, limit=10)
