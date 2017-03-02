@@ -3,6 +3,8 @@ import numpy as np
 import random
 from keras import backend as K
 
+import matplotlib.pylab as plt
+
 def load_class_mapping(basedir='data', type='theme'):
 	"""load the mapping of ids to theme categories"""
 	d = {}
@@ -86,8 +88,19 @@ def generate_labelled_patches(gridrefs, patchsize, patchstep=1, batch_size=32, s
 					else:
 						yield batch_img, batch_clz
 
-def load_labelled_patches(gridrefs, patchsize, patchstep=1, limit=None, shuffle=False, basedir='data', clztype='theme', vistype='3band'):
-	"""Generate batches of labelled patches"""
+def extract_roi(img, clz, subcoords):
+	img = img[subcoords[0][0]:subcoords[1][0], subcoords[0][1]:subcoords[1][1], :]
+	clz = clz[subcoords[0][0]:subcoords[1][0], subcoords[0][1]:subcoords[1][1]]
+	return img, clz
+
+def load_labelled_patches(gridrefs, patchsize, patchstep=1, subcoords=None, limit=None, shuffle=False, basedir='data', clztype='theme', vistype='3band'):
+	"""Load a set of labelled patches into memory"""
+	
+	if subcoords != None:
+		assert len(gridrefs) == 1, 'subcoords can only be used with a single image'
+		assert limit == None, 'subcoords and limit are mutually exclusive'
+		assert shuffle == False, 'Shuffling when using subcoords isn\'t supported'
+
 	mapping = load_class_mapping(basedir=basedir, type=clztype)
 	mapping_keys = [ k for k in mapping ]
 
@@ -106,10 +119,13 @@ def load_labelled_patches(gridrefs, patchsize, patchstep=1, limit=None, shuffle=
 		img = img.astype(K.floatx())
 		img = img / 255
 
+		if subcoords != None:
+			img,clz = extract_roi(img, clz, subcoords)
+
 		width, height, depth = img.shape
 
 		if batch_clz == None:
-			batch_size = len(gridrefs) * (1 + ((height - patchsize) / patchstep)) * (1 + ((width - patchsize) / patchstep))
+			batch_size = len(gridrefs) * (((height - patchsize) / patchstep)) * (((width - patchsize) / patchstep))
 			if limit != None:
 				batch_size = min(batch_size, limit)
 			batch_clz = np.zeros((batch_size, len(mapping)))
@@ -128,7 +144,7 @@ def load_labelled_patches(gridrefs, patchsize, patchstep=1, limit=None, shuffle=
 			batch_clz[batch_idx, :] = 0
 			batch_clz[batch_idx][mapping_keys.index(theclz)] = 1 
 			batch_idx = batch_idx + 1
-			if batch_idx == limit / len(gridrefs):
+			if batch_idx == batch_size / len(gridrefs):
 				break
 
 	if dim_ordering == 'th':
@@ -141,4 +157,4 @@ def load_labelled_patches(gridrefs, patchsize, patchstep=1, limit=None, shuffle=
 # 	for patch, clz in batch:
 # 		print patch
 
-# print load_labelled_patches(["SU4111"], 3, limit=10)
+# print load_labelled_patches(["SU4111"], 3, subcoords=((0,0), (100,100)))
