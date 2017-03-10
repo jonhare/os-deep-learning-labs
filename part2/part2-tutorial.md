@@ -81,7 +81,7 @@ plt.show()
 ```
 You can see that accessing the dataset is quite easy: the first argument to the `load_labelled_patches` function specifies a list of tiles to load from; the second specifies how big the patches are, the optional `limit` argument ensures we only load 4 patches, and the optional `shuffle` argument tells the function to pick the patches randomly rather than in scan order. Running the above example, you should see something like the image below (obviously you'll get different patches because of the shuffling).
 
-![Examples from the SU41 dataset](https://raw.githubusercontent.com/jonhare/os-deep-learning-labs/master/part2/images/vis.png "Examples from the SU41 dataset")
+![Examples from the SU41 dataset](https://github.com/jonhare/os-deep-learning-labs/raw/master/part2/images/vis.png "Examples from the SU41 dataset")
 
 > __Exercise:__ Have a play with the above code and explore the other parameters of the `load_labelled_patches` function. What happens when you disable shuffle and alter the step size?
 
@@ -199,7 +199,7 @@ Running this should result in the following:
 
 with a set of sample predictions that looks something like this:
 
-![Example classifications](https://raw.githubusercontent.com/jonhare/os-deep-learning-labs/master/part2/images/cnn1-class.png "Example classifications")
+![Example classifications](https://github.com/jonhare/os-deep-learning-labs/raw/master/part2/images/cnn1-class.png "Example classifications")
 
 In this particular case the overall accuracies are all quite high (in terms of both training and validation), which is pleasing. Be aware though that we're using a relatively small set of both training and validation data, and that there is a very high bias in the class distribution which inevitably could lead to higher accuracies because of common classes.
 
@@ -235,11 +235,11 @@ plt.savefig("test_pred.png")
 
 If we now run this, we'll get a "ground-truth" image that looks like this:
 
-![Test ground-truth theme map](https://raw.githubusercontent.com/jonhare/os-deep-learning-labs/master/part2/images/test_gt.png "Test ground-truth theme map")
+![Test ground-truth theme map](https://github.com/jonhare/os-deep-learning-labs/raw/master/part2/images/test_gt.png "Test ground-truth theme map")
 
 and a "predictions" image that looks something like this (results will vary depending on the sample of data used for training):
 
-![Test predictions theme map](https://raw.githubusercontent.com/jonhare/os-deep-learning-labs/master/part2/images/test_pred.png "Test predictions theme map")
+![Test predictions theme map](https://github.com/jonhare/os-deep-learning-labs/raw/master/part2/images/test_pred.png "Test predictions theme map")
 
 In this case we can see that the result is not particularly good, although undoubtly this is due to the tiny amount of training our network has had as well as the fact that our predictions are entirely based on looking at a 28x28 pixel window of the image (bearing in mind that this is only 7m x 7m on the ground, which is pretty tiny and obviously fails to capture any context from the surroundings). 
 
@@ -269,7 +269,7 @@ model.fit_generator(train_data, samples_per_epoch=10016, nb_epoch=10, validation
 
 If we run the code now after each epoch has passed an image will be saved. Here's the image from the first epoch:
 
-![Epoch 1 theme map](https://raw.githubusercontent.com/jonhare/os-deep-learning-labs/master/part2/images/map_epoch0.png "Epoch 1 theme map")
+![Epoch 1 theme map](https://github.com/jonhare/os-deep-learning-labs/raw/master/part2/images/map_epoch0.png "Epoch 1 theme map")
 
 > __Exercise:__ It's a little difficult to interprete whether the above validation theme map is actually any good because we don't exactly know what it should look like (we can compare against the ground-truth in the data directory, but this is a different size). Add some additional code to save the validation data ground-truth theme map before training starts so we have something to compare against.
 
