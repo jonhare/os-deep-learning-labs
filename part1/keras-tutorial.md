@@ -1,15 +1,16 @@
 # Learning to Deep Learn using Python, Keras, Theano, TensorFlow and a GPU
 
-_[Jonathon Hare, 30th October 2016](https://github.com/jonhare/vlc-deep-learning-labs)_
+_[Jonathon Hare, 8th March 2017](https://github.com/jonhare/os-deep-learning-labs)_
 
-## Introduction and Acknowledgements
-This tutorial is largely based on Jason Brownlee's ["Handwritten Digit Recognition using Convolutional Neural Networks in Python with Keras"](http://machinelearningmastery.com/handwritten-digit-recognition-using-convolutional-neural-networks-python-keras/) tutorial. A number of changes have been made to ensure that it better fits our format, and we've added additional bits and exercises throughout.
+## Acknowledgements
+This part of the tutorial is largely based on Jason Brownlee's ["Handwritten Digit Recognition using Convolutional Neural Networks in Python with Keras"](http://machinelearningmastery.com/handwritten-digit-recognition-using-convolutional-neural-networks-python-keras/) tutorial. A number of changes have been made to ensure that it better fits our format, and I've added additional bits and exercises throughout. This version extends on one that I ran for the VLC research group in October 2016.
 
+## Introduction 
 A popular demonstration of the capability of deep learning techniques is object recognition in image data. The "hello world" of object recognition for machine learning and deep learning is the MNIST dataset for handwritten digit recognition.
 
-In this tutorial you will discover how to develop a deep learning model to achieve near state of the art performance on the MNIST handwritten digit recognition task in Python using the Keras deep learning library.
+In this part of the tutorial you will discover how to develop a deep learning model to achieve near state of the art performance on the MNIST handwritten digit recognition task in Python using the Keras deep learning library.
 
-Through this tutorial you'll learn how to:
+Through this part of the tutorial you'll learn how to:
 
 * How to load the MNIST dataset in Keras.
 * How to develop and evaluate a baseline neural network model for the MNIST problem.

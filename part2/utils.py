@@ -15,9 +15,13 @@ def load_class_mapping(basedir='data', type='theme'):
 
 	return d
 
+def load_class_names(basedir='data', type='theme'):
+	return load_class_mapping(basedir, type).values()
+
 def load_image_pair(gridref, basedir='data', clztype='theme', vistype='3band'):
 	"""load the sensor and classified images corresponding to a grid ref (XXEENN)."""
 	img = cv2.imread("{0}/{1}/{2}.TIF".format(basedir, vistype, gridref), cv2.IMREAD_ANYCOLOR)
+	img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 	clz = cv2.imread("{0}/{1}/{2}-{1}.png".format(basedir, clztype, gridref), cv2.IMREAD_ANYDEPTH)
 	return img, clz
 

@@ -4,7 +4,6 @@ import random
 import matplotlib.pylab as plt
 from keras.datasets import mnist
 from keras import backend as K
-K.set_image_dim_ordering('th')
 
 from utils import generate_labelled_patches, load_class_mapping, load_labelled_patches
 import models
@@ -14,7 +13,7 @@ seed = 7
 np.random.seed(seed)
 random.seed(seed)
 
-patch_size = 128
+patch_size = 128 
 
 # load data
 train_data = generate_labelled_patches(["SU4111"], patch_size, shuffle=True, batch_size=128)
