@@ -44,22 +44,19 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 model.fit_generator(train_data, samples_per_epoch=10016, nb_epoch=10, validation_data=valid_data, verbose=1)
 
 # load 4 randomly selected patches and their labels
-(X_test, y_test_true) = load_labelled_patches(["SU4012"], patch_size, limit=4, shuffle=True)
+(X_test, y_test_true) = load_labelled_patches(["SU4012"], patch_size, limit=25, shuffle=True)
 y_test = model.predict_classes(X_test)
 
 #if we're using the theano backend, we need to change indexing order for matplotlib to interpret the patches:
 if K.image_dim_ordering() == 'th':
-	X_test = X_test.transpose(0, 3, 1, 2)
+	X_test = X_test.transpose(0, 2, 3, 1)
+
+print y_test
 
 # plot 4 images
-plt.subplot(221).set_title(clznames[y_test[0].argmax()])
-plt.imshow(X_test[0])
-plt.subplot(222).set_title(clznames[y_test[1].argmax()])
-plt.imshow(X_test[1])
-plt.subplot(223).set_title(clznames[y_test[2].argmax()])
-plt.imshow(X_test[2])
-plt.subplot(224).set_title(clznames[y_test[3].argmax()])
-plt.imshow(X_test[3])
+for i in xrange(0,4):
+	plt.subplot(2,2,i+1).set_title(clznames[y_test[i]] + "\n" + clznames[y_test_true[i].argmax()])
+	plt.imshow(X_test[i])
 
 # show the plot
 plt.show()
