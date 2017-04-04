@@ -28,7 +28,8 @@ y_train = np_utils.to_categorical(y_train)
 y_test = np_utils.to_categorical(y_test)
 num_classes = y_test.shape[1]
 
-from keras.layers import Input, merge
+from keras.layers import Input
+from keras.layers.merge import add
 from keras.models import Model
 
 def branch_model():
@@ -36,10 +37,10 @@ def branch_model():
 	model = Sequential()
 
 	x = Input(shape=(1, 28, 28))
-	left = Convolution2D(16, 1, 1, border_mode='same')(x)
-	right = Convolution2D(16, 5, 5, border_mode='same', input_shape=(1, 28, 28), activation='relu')(x)
-	y = merge([left, right], mode='sum')
-	block = Model(input=x, output=y)
+	left = Convolution2D(16, (1, 1), padding='same')(x)
+	right = Convolution2D(16, (5, 5), padding='same', input_shape=(1, 28, 28), activation='relu')(x)
+	y = add([left, right])
+	block = Model(inputs=x, outputs=y)
 
 	model.add(block)
 	model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -54,7 +55,7 @@ def branch_model():
 # build the model
 model = branch_model()
 # Fit the model
-model.fit(X_train, y_train, validation_data=(X_test, y_test), nb_epoch=10, batch_size=200, verbose=2)
+model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=10, batch_size=200, verbose=2)
 # Final evaluation of the model
 scores = model.evaluate(X_test, y_test, verbose=0)
 print("Baseline Error: %.2f%%" % (100-scores[1]*100))

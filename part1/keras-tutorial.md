@@ -2,6 +2,11 @@
 
 _[Jonathon Hare, 8th March 2017](https://github.com/jonhare/os-deep-learning-labs)_
 
+## Change History
+
+20170308: Initial version
+20170403: Update to use Keras 2 API
+
 ## Acknowledgements
 This part of the tutorial is largely based on Jason Brownlee's ["Handwritten Digit Recognition using Convolutional Neural Networks in Python with Keras"](http://machinelearningmastery.com/handwritten-digit-recognition-using-convolutional-neural-networks-python-keras/) tutorial. A number of changes have been made to ensure that it better fits our format, and I've added additional bits and exercises throughout. This version extends on one that I ran for the VLC research group in October 2016.
 
@@ -151,8 +156,8 @@ We are now ready to create our simple neural network model. We will define our m
 def baseline_model():
 	# create model
 	model = Sequential()
-	model.add(Dense(num_pixels, input_dim=num_pixels, init='normal', activation='relu'))
-	model.add(Dense(num_classes, init='normal', activation='softmax'))
+	model.add(Dense(num_pixels, input_dim=num_pixels, kernel_initializer='normal', activation='relu'))
+	model.add(Dense(num_classes, kernel_initializer='normal', activation='softmax'))
 	# Compile model
 	model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 	return model
@@ -170,7 +175,7 @@ Finally, the test dataset is used to evaluate the model and a classification err
 # build the model
 model = baseline_model()
 # Fit the model
-model.fit(X_train, y_train, validation_data=(X_test, y_test), nb_epoch=10, batch_size=200, verbose=2)
+model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=10, batch_size=200, verbose=2)
 # Final evaluation of the model
 scores = model.evaluate(X_test, y_test, verbose=0)
 print("Baseline Error: %.2f%%" % (100-scores[1]*100))
@@ -356,7 +361,7 @@ As before, the model is trained using logarithmic loss and the ADAM gradient des
 def baseline_model():
 	# create model
 	model = Sequential()
-	model.add(Convolution2D(32, 5, 5, border_mode='valid', input_shape=(1, 28, 28), activation='relu'))
+	model.add(Convolution2D(32, (5, 5), padding='valid', input_shape=(1, 28, 28), activation='relu'))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Dropout(0.2))
 	model.add(Flatten())
@@ -373,7 +378,7 @@ We evaluate the model the same way as before with the multi-layer perceptron. Th
 # build the model
 model = baseline_model()
 # Fit the model
-model.fit(X_train, y_train, validation_data=(X_test, y_test), nb_epoch=10, batch_size=200, verbose=2)
+model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=10, batch_size=200, verbose=2)
 # Final evaluation of the model
 scores = model.evaluate(X_test, y_test, verbose=0)
 print("Baseline Error: %.2f%%" % (100-scores[1]*100))
@@ -462,9 +467,9 @@ This time we define a large CNN architecture with additional convolutional, max 
 def larger_model():
 	# create model
 	model = Sequential()
-	model.add(Convolution2D(30, 5, 5, border_mode='valid', input_shape=(1, 28, 28), activation='relu'))
+	model.add(Convolution2D(30, (5, 5), padding='valid', input_shape=(1, 28, 28), activation='relu'))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
-	model.add(Convolution2D(15, 3, 3, activation='relu'))
+	model.add(Convolution2D(15, (3, 3), activation='relu'))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Dropout(0.2))
 	model.add(Flatten())
@@ -482,7 +487,7 @@ Like the previous two experiments, the model is fit over 10 epochs with a batch 
 # build the model
 model = larger_model()
 # Fit the model
-model.fit(X_train, y_train, validation_data=(X_test, y_test), nb_epoch=10, batch_size=200, verbose=2)
+model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=10, batch_size=200, verbose=2)
 # Final evaluation of the model
 scores = model.evaluate(X_test, y_test, verbose=0)
 print("Baseline Error: %.2f%%" % (100-scores[1]*100))
@@ -680,17 +685,18 @@ plt.show()
 Recent network models, such as the deep residual network (ResNet) and GoogLeNet architectures, do not follow a straight path from input to output. Instead, these models incorporate branches and merges to create a computation graph. Branching and merging is easy to implement in Keras as show in the following code snippet:
 
 ```python
-from keras.layers import Input, merge
+from keras.layers import Input
+from keras.layers.merge import add
 from keras.models import Model
 
 def branch_model():
 	model = Sequential()
 
 	x = Input(shape=(1, 28, 28))
-	left = Convolution2D(16, 1, 1, border_mode='same')(x)
-	right = Convolution2D(16, 5, 5, border_mode='same', input_shape=(1, 28, 28), activation='relu')(x)
-	y = merge([left, right], mode='sum')
-	block = Model(input=x, output=y)
+	left = Convolution2D(16, (1, 1), padding='same')(x)
+	right = Convolution2D(16, (5, 5), padding='same', input_shape=(1, 28, 28), activation='relu')(x)
+	y = add([left, right])
+	block = Model(inputs=x, outputs=y)
 
 	model.add(block)
 	model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -698,6 +704,7 @@ def branch_model():
 	model.add(Flatten())
 	model.add(Dense(128, activation='relu'))
 	model.add(Dense(num_classes, activation='softmax'))
+	
 	# Compile model
 	model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 	return model
