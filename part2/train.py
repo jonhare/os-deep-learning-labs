@@ -46,7 +46,7 @@ class DisplayMap(keras.callbacks.Callback):
 		plt.savefig("map_epoch%s.png" % epoch)
 
 # Fit the model
-model.fit_generator(train_data, samples_per_epoch=(4000-patch_size)**2, nb_epoch=100, validation_data=valid_data, verbose=1, callbacks=[DisplayMap()])
+model.fit_generator(train_data, steps_per_epoch=(4000-patch_size)**2, epochs=100, validation_data=valid_data, verbose=1, callbacks=[DisplayMap()])
 
 # Final evaluation of the model
 test_data = load_labelled_patches(["SU4311"], patch_size, subcoords=((0,0), (300,300)))

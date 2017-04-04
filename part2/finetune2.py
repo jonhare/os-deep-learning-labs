@@ -48,6 +48,6 @@ model.compile(loss='binary_crossentropy',
 # fine-tune the model
 model.fit_generator(
         train_data,
-        samples_per_epoch=10016,
-        nb_epoch=10,
+        steps_per_epoch=313,
+        epochs=10,
         validation_data=valid_data)

@@ -4,8 +4,8 @@ _[Jonathon Hare, 8th March 2017](https://github.com/jonhare/os-deep-learning-lab
 
 ## Change History
 
-20170308: Initial version
-20170403: Update to use Keras 2 API
+- 20170308: Initial version
+- 20170403: Update to use Keras 2 API
 
 ## Acknowledgements
 This part of the tutorial is largely based on Jason Brownlee's ["Handwritten Digit Recognition using Convolutional Neural Networks in Python with Keras"](http://machinelearningmastery.com/handwritten-digit-recognition-using-convolutional-neural-networks-python-keras/) tutorial. A number of changes have been made to ensure that it better fits our format, and I've added additional bits and exercises throughout. This version extends on one that I ran for the VLC research group in October 2016.

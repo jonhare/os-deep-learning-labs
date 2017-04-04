@@ -2,7 +2,10 @@
 
 _[Jonathon Hare, 8th March 2017](https://github.com/jonhare/os-deep-learning-labs)_
 
-## Acknowledgements
+## Change History
+
+- 20170308: Initial version
+- 20170403: Update to use Keras 2 API
 
 ## Introduction
 
@@ -120,9 +123,9 @@ from keras.layers.convolutional import MaxPooling2D
 def larger_model(input_shape, num_classes):
 	# create model
 	model = Sequential()
-	model.add(Convolution2D(30, 5, 5, border_mode='valid', input_shape=input_shape, activation='relu'))
+	model.add(Convolution2D(30, (5, 5), padding='valid', input_shape=input_shape, activation='relu'))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
-	model.add(Convolution2D(15, 3, 3, activation='relu'))
+	model.add(Convolution2D(15, (3, 3), activation='relu'))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Dropout(0.2))
 	model.add(Flatten())
@@ -141,10 +144,10 @@ Specifying the input shape using the shape of the first validation instance allo
 
 ```python
 # Fit the model
-model.fit_generator(train_data, samples_per_epoch=10016, nb_epoch=10, validation_data=valid_data, verbose=1)
+model.fit_generator(train_data, steps_per_epoch=313, epochs=10, validation_data=valid_data, verbose=1)
 ```
 
-We've specified 10016 `samples_per_epoch` to keep computation time down; this number is exactly divisable by the default batch size of 32. In actuallity if we want to sample all patches from a single tile in an epoch (assuming a 1px step), there are `(4000-patch_size)**2` samples available to us. This is a rather large number and will take a significant amount of time - in fact for reasonable patch sizes this is approaching the total size of the ImageNet data from just one tile! Note that by having a smaller number of samples per epoch than in the actual data that each epoch will end up having a different sample of training data to work with.
+We've specified 313 `steps_per_epoch` to keep computation time down; this is the number of batches that will be processed in each epoch. In actuallity if we want to sample all patches from a single tile in an epoch (assuming a 1px step), there are `(4000-patch_size)**2` samples available to us. This is a rather large number and will take a significant amount of time - in fact for reasonable patch sizes this is approaching the total size of the ImageNet data from just one tile! Note that by having a smaller number of samples per epoch than in the actual data that each epoch will end up having a different sample of training data to work with.
 
 Finally, before we try running this model, lets add the code to load samples from another tile and make and display some classifications:
 
@@ -201,7 +204,7 @@ In this particular case the overall accuracies are all quite high (in terms of b
 > __Exercise:__ Have a play with the above code and explore the effect of patch size and the amount of training and validation data.
 
 ## Mapping the classifications
-Now we can make predictions for a tile it would be quite nice to make a modification so that we can try and reconstruct theme maps directly from the 3-band images. This is often called semantic segmentation. An easy approach that we can take is to take spatiatlly sequential patches, and reconstruct an "image" based on the class assignments. This is effective, but highly computationally inefficient - better approaches are to convert the network to be fully convolutional (see e.g. https://devblogs.nvidia.com/parallelforall/image-segmentation-using-digits-5/#comment-1891), or to use a specialist type of network that actually outputs segmentation maps directly (usually these networks are based on layers of downsampling convolutions like we're using in our network, followed by layers of upsampling or deconvolution which aim to increase the spatial resolution back up to the size of the input). 
+Now we can make predictions for a tile it would be quite nice to make a modification so that we can try and reconstruct theme maps directly from the 3-band images. This is often called semantic segmentation. An easy approach that we can take is to take spatially sequential patches, and reconstruct an "image" based on the class assignments. This is effective, but highly computationally inefficient - better approaches are to convert the network to be fully convolutional (see e.g. https://devblogs.nvidia.com/parallelforall/image-segmentation-using-digits-5/#comment-1891), or to use a specialist type of network that actually outputs segmentation maps directly (usually these networks are based on layers of downsampling convolutions like we're using in our network, followed by layers of upsampling or deconvolution which aim to increase the spatial resolution back up to the size of the input). 
 
 For now, let's implement the naive approach by building a theme map for some test data. We'll keep the same code as above, but modify the parts involving the test data as follows:
 
@@ -236,7 +239,7 @@ and a "predictions" image that looks something like this (results will vary depe
 
 ![Test predictions theme map](https://github.com/jonhare/os-deep-learning-labs/raw/master/part2/images/test_pred.png "Test predictions theme map")
 
-In this case we can see that the result is not particularly good, although undoubtly this is due to the tiny amount of training our network has had as well as the fact that our predictions are entirely based on looking at a 28x28 pixel window of the image (bearing in mind that this is only 7m x 7m on the ground, which is pretty tiny and obviously fails to capture any context from the surroundings). 
+In this case we can see that the result is not particularly good, although undoubtedly this is due to the tiny amount of training our network has had as well as the fact that our predictions are entirely based on looking at a 28x28 pixel window of the image (bearing in mind that this is only 7m x 7m on the ground, which is pretty tiny and obviously fails to capture any context from the surroundings). 
 
 One additional change we might like to make to our code is to add a "callback" that produces and saves a theme-map for the validation data after each epoch; this will allow us to visually monitor how the network is learning. Firstly we need to modify the validation data to be loaded from a region of a tile in scan order rather than from random sampling:
 
@@ -259,14 +262,14 @@ class DisplayMap(keras.callbacks.Callback):
 Finally, we need to modify the call to `fit_generator` to include the callback:
 
 ```python
-model.fit_generator(train_data, samples_per_epoch=10016, nb_epoch=10, validation_data=valid_data, verbose=1, callbacks=[DisplayMap()])
+model.fit_generator(train_data, steps_per_epoch=313, epochs=10, validation_data=valid_data, verbose=1, callbacks=[DisplayMap()])
 ```
 
 If we run the code now after each epoch has passed an image will be saved. Here's the image from the first epoch:
 
 ![Epoch 1 theme map](https://github.com/jonhare/os-deep-learning-labs/raw/master/part2/images/map_epoch0.png "Epoch 1 theme map")
 
-> __Exercise:__ It's a little difficult to interprete whether the above validation theme map is actually any good because we don't exactly know what it should look like (we can compare against the ground-truth in the data directory, but this is a different size). Add some additional code to save the validation data ground-truth theme map before training starts so we have something to compare against.
+> __Exercise:__ It's a little difficult to interpret whether the above validation theme map is actually any good because we don't exactly know what it should look like (we can compare against the ground-truth in the data directory, but this is a different size). Add some additional code to save the validation data ground-truth theme map before training starts so we have something to compare against.
 
 ## Using a better network model - transferring and finetuning a pretrained ResNet
 Training a network from scratch can be a lot of work. Is there some way we could take an existing network trained on some data with one set of labels, and adapt it to work on a different data set with different labels? Assuming that the inputs of the network are equivalent (for example, image with the same number of bands and size), then the answer is an emphatic yes! This process of "finetuning" a pre-trained network has become common-place as its much faster an easier than starting from scratch. 

@@ -25,9 +25,9 @@ num_classes = len(clznames)
 def larger_model(input_shape, num_classes):
 	# create model
 	model = Sequential()
-	model.add(Convolution2D(30, 5, 5, border_mode='valid', input_shape=input_shape, activation='relu'))
+	model.add(Convolution2D(30, (5, 5), padding='valid', input_shape=input_shape, activation='relu'))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
-	model.add(Convolution2D(15, 3, 3, activation='relu'))
+	model.add(Convolution2D(15, (3, 3), activation='relu'))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Dropout(0.2))
 	model.add(Flatten())
@@ -42,7 +42,7 @@ model = larger_model(valid_data[0][0].shape, num_classes)
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 # Fit the model
-model.fit_generator(train_data, samples_per_epoch=10016, nb_epoch=10, validation_data=valid_data, verbose=1)
+model.fit_generator(train_data, steps_per_epoch=313, epochs=10, validation_data=valid_data, verbose=1)
 
 # load some test data; this time we specifically load patches from a 300x300 square of a tile in scan-order
 test_data = load_labelled_patches(["SU4012"], patch_size, subcoords=((0,0), (300,300)))
