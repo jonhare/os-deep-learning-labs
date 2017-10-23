@@ -3,8 +3,6 @@ import numpy as np
 import random
 from keras import backend as K
 
-import matplotlib.pylab as plt
-
 def load_class_mapping(basedir='data', type='theme'):
 	"""load the mapping of ids to theme categories"""
 	d = {}
